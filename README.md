@@ -1,2 +1,329 @@
 # utl-adding-a-password-to-your-pdf-sas--free-forever-pdfgear-python
 Adding a password to your pdf sas  free forever pdfgear python
+    %let pgm=utl-adding-a-password-to-your-pdf-sas--free-forever-pdfgear-python;
+
+    %stop_submission;
+
+    Adding a password to your pdf sas  free forever pdfgear python;
+
+
+    TWO SOLUTIONS (acrobat reader cannot add passwords)
+
+       1 sas call qpdf install: 'winget install QPDF.QPDF'
+       2 pdfgear (can update in place)
+       3 python pikepdf
+
+    github
+    https://tinyurl.com/7wa2s7vf
+    https://github.com/rogerjdeangelis/utl-forever-free-for-now-pdfgear-edit-split-combine-delete-pages-substitute-for-acrobat-pro
+
+    Installs pdfgear 133mb
+
+    https://www.pdfgear.com
+    https://tinyurl.com/ypf9wke9
+    https://1drv.ms/u/c/bb0f3c4c9b1dc58b/EU8ZJuahI8FAj_yOGR4GdiYBWfTvjrEXm53qwZJUj2yXhg?e=DcNdEr
+
+
+    /**************************************************************************************************************************/
+    /* INPUT                  | PROCESS                                      |  OUTPUT                                        */
+    /* ====                   | =======                                      |  ======                                        */
+    /* d:/pdf/class/pdf       | 1 sas call qpdf                              |  d:/pdf/class_ps.pdf (open in pdfgear)         */
+    /*  NAME      SEX    AGE  |                                              |                                                */
+    /* Alfred      M      14  | Open cmd.exe w admin                         |                                                */
+    /* Alice       F      13  | winget install QPDF.QPDF                     |  +--------------------------------+            */
+    /* Barbara     F      13  |                                              |  | Enter Password                 |            */
+    /* Carol       F      14  | * recreate input pdf;                        |  |                                |            */
+    /* Henry       M      14  | %utlfkil(d:/pdf/class.pdf);                  |  | This documents is password     |            */
+    /* James       M      12  | %utlfkil(d:/pdf/class_ps.pdf);               |  | protected.                     |            */
+    /*                        |                                              |  |                                |            */
+    /*                        | ods pdf file=                                |  |          --------------------  |            */
+    /*                        |  "d:/pdf/class.pdf";                         |  | Password | Type Here         | |            */
+    /* data class ;           | proc print data=class;                       |  |          --------------------- |            */
+    /*   input                | run;quit;                                    |  |                                |            */
+    /*     name$              | ods pdf close;                               |  |                     Cancel Ok  |            */
+    /*     sex$ age;          |                                              |  |                                |            */
+    /* cards4;                | data _null_;                                 |  +--------------------------------+            */
+    /* Alfred  M 14           |  cmd=catx(' ',                               |                                                */
+    /* Alice   F 13           |    "qpdf --encrypt secret"                   |                                                */
+    /* Barbara F 13           |    ,"secret 128"                             |                                                */
+    /* Carol   F 14           |    ,"-- d:/pdf/class.pdf"                    |                                                */
+    /* Henry   M 14           |    ,"d:/pdf/class_ps.pdf");                  |                                                */
+    /* James   M 12           |  call system(cmd);                           |                                                */
+    /* ;;;;                   | run;quit;                                    |                                                */
+    /* run;quit;              |                                              |                                                */
+    /*                        |-----------------------------------------------------------------------------------------------*/
+    /* ods pdf file=          |                                              |                                                */
+    /*  "d:/pdf/class.pdf";   | 2 PDFGEAR                                    |  d:/pdf/class.pdf (when you open pdfgear)                             */
+    /* proc print data=class; | ========                                     |                                                */
+    /* run;quit;              |                                              |  +--------------------------------+            */
+    /* ods pdf close;         | Open d:/pdf/class.pdf in pdfgear             |  | Enter Password                 |            */
+    /*                        | Top Toolbar                                  |  |                                |            */
+    /*                        | Tools>Password                               |  | This documents is password     |            */
+    /*                        |                                              |  | protected.                     |            */
+    /*                        | +--------------------------------+           |  |                                |            */
+    /*                        | | Set Password                   |           |  |          --------------------  |            */
+    /*                        | |                                |           |  | Password | Type Here         | |            */
+    /*                        | |          --------------------- |           |  |          --------------------- |            */
+    /*                        | | Password |                   | |           |  |                                |            */
+    /*                        | |          ----------------------|           |  |                     Cancel Ok  |            */
+    /*                        | |                                |           |  |                                |            */
+    /*                        | |          --------------------- |           |  +--------------------------------+            */
+    /*                        | | Confirm  |                   | |           |                                                */
+    /*                        | |          --------------------- |           |                                                */
+    /*                        | |                                |           |                                                */
+    /*                        | |                Cancel Confirm  |           |                                                */
+    /*                        | |                                |           |                                                */
+    /*                        | +--------------------------------+           |                                                */
+    /*                        |                                              |                                                */
+    /*                        |-----------------------------------------------------------------------------------------------*/
+    /*                        | NOTE: PDFGEAR UPDATES IN PLACE               |                                                */
+    /*                        |                                              |                                                */
+    /*                        | 2 PYTHON PIKEPDF                             |   d:/pdf/class_ps.pdf (copy w password         */
+    /*                        | ================                             |                                                */
+    /*                        |                                              |   +--------------------------------+           */
+    /*                        | * recreate input pdf;                        |   | Enter Password                 |           */
+    /*                        | %utlfkil(d:/pdf/class.pdf);                  |   |                                |           */
+    /*                        | %utlfkil(d:/pdf/class_ps.pdf);               |   | This documents is password     |           */
+    /*                        |                                              |   | protected.                     |           */
+    /*                        | ods pdf file=                                |   |                                |           */
+    /*                        |  "d:/pdf/class.pdf";                         |   |          --------------------  |           */
+    /*                        | proc print data=class;                       |   | Password | Type Here         | |           */
+    /*                        | run;quit;                                    |   |          --------------------- |           */
+    /*                        | ods pdf close;                               |   |                                |           */
+    /*                        |                                              |   |                     Cancel Ok  |           */
+    /*                        | %utl_pybeginx;                               |   |                                |           */
+    /*                        | parmcards4;                                  |   +--------------------------------+           */
+    /*                        | import pikepdf                               |                                                */
+    /*                        | old_PDF = pikepdf.Pdf.open( \                |                                                */
+    /*                        |   "d:/pdf/class.pdf")                        |                                                */
+    /*                        | allow_key=pikepdf.Permissions(extract=False) |                                                */
+    /*                        | old_PDF.save(  \                             |                                                */
+    /*                        |   "d:/pdf/class_ps.pdf"  \                   |                                                */
+    /*                        |  ,encryption=pikepdf.Encryption( \           |                                                */
+    /*                        |     user="123456"   \                        |                                                */
+    /*                        |    ,owner="roger" \                          |                                                */
+    /*                        |    ,allow=allow_key))                        |                                                */
+    /*                        | print("New PDF created with password")       |                                                */
+    /*                        | ;;;;                                         |                                                */
+    /*                        | %utl_pyendx;                                 |                                                */
+    /*                        |                                              |                                                */
+    /*                        | NOTE: PDFGEAR MAKES A COPY W PASSWORD        |                                                */
+    /**************************************************************************************************************************/
+    /*                   _
+    (_)_ __  _ __  _   _| |_
+    | | `_ \| `_ \| | | | __|
+    | | | | | |_) | |_| | |_
+    |_|_| |_| .__/ \__,_|\__|
+            |_|
+    */
+
+    data class ;
+      input
+        name$
+        sex$ age;
+    cards4;
+    Alfred  M 14
+    Alice   F 13
+    Barbara F 13
+    Carol   F 14
+    Henry   M 14
+    James   M 12
+    ;;;;
+    run;quit;
+
+    ods pdf file=
+     "d:/pdf/class.pdf";
+    proc print data=class;
+    run;quit;
+    ods pdf close;
+
+    /**************************************************************************************************************************/
+    /* d:/pdf/class.pdf                                                                                                       */
+    /*                                                                                                                        */
+    /*   NAME      SEX    AGE                                                                                                 */
+    /*  Alfred      M      14                                                                                                 */
+    /*  Alice       F      13                                                                                                 */
+    /*  Barbara     F      13                                                                                                 */
+    /*  Carol       F      14                                                                                                 */
+    /*  Henry       M      14                                                                                                 */
+    /*  James       M      12                                                                                                 */
+    /**************************************************************************************************************************/
+
+    /*                             _ _                   _  __
+    / |  ___  __ _ ___    ___ __ _| | |   __ _ _ __   __| |/ _|
+    | | / __|/ _` / __|  / __/ _` | | |  / _` | `_ \ / _` | |_
+    | | \__ \ (_| \__ \ | (_| (_| | | | | (_| | |_) | (_| |  _|
+    |_| |___/\__,_|___/  \___\__,_|_|_|  \__, | .__/ \__,_|_|
+                                            |_|_|
+    */
+    /*--- install qpdf
+    Open cmd.exe w admin
+    winget install QPDF.QPDF
+    ---*/
+
+    * recreate input pdf;
+    %utlfkil(d:/pdf/class.pdf);
+    %utlfkil(d:/pdf/class_ps.pdf);
+
+    ods pdf file=
+     "d:/pdf/class.pdf";
+    proc print data=class;
+    run;quit;
+    ods pdf close;
+
+    data _null_;
+     length cmd $255;
+     cmd=catx(' ',
+       "qpdf --encrypt secret"
+       ,"secret 128"
+       ,"-- d:/pdf/class.pdf"
+       ,"d:/pdf/class_ps.pdf");
+     call system(cmd);
+    run;quit;
+
+    /***************************************************************************************************************************/
+    /*| d:/pdf/class_ps.pdf (open in pdfgear)                                                                                  */
+    /*|                                                                                                                        */
+    /*| +--------------------------------+                                                                                     */
+    /*| | Enter Password                 |                                                                                     */
+    /*| |                                |                                                                                     */
+    /*| | This documents is password     |                                                                                     */
+    /*| | protected.                     |                                                                                     */
+    /*| |                                |                                                                                     */
+    /*| |          --------------------  |                                                                                     */
+    /*| | Password | Type Here         | |                                                                                     */
+    /*| |          --------------------- |                                                                                     */
+    /*| |                                |                                                                                     */
+    /*| |                     Cancel Ok  |                                                                                     */
+    /*| |                                |                                                                                     */
+    /*| +--------------------------------+                                                                                     */
+    /***************************************************************************************************************************/
+
+    /*___              _  __
+    |___ \   _ __   __| |/ _| __ _  ___  __ _ _ __
+      __) | | `_ \ / _` | |_ / _` |/ _ \/ _` | `__|
+     / __/  | |_) | (_| |  _| (_| |  __/ (_| | |
+    |_____| | .__/ \__,_|_|  \__, |\___|\__,_|_|
+            |_|              |___/
+     _                   _
+    (_)_ __  _ __  _   _| |_
+    | | `_ \| `_ \| | | | __|
+    | | | | | |_) | |_| | |_
+    |_|_| |_| .__/ \__,_|\__|
+            |_|
+    */
+
+    Open d:/pdf/class.pdf in pdfgear
+    Top Toolbar
+    Tools->Password
+
+    /**************************************************************************************************************************/
+    /* Set password                                                                                                                       */
+    /*                                                                                                                        */
+    /* Open d:/pdf/class.pdf in pdfgear                                                                                       */
+    /* Top Toolbar                                                                                                            */
+    /* Tools>Password                                                                                                         */
+    /*                                                                                                                        */
+    /* +--------------------------------+                                                                                     */
+    /* | Set Password                   |                                                                                     */
+    /* |                                |                                                                                     */
+    /* |          --------------------- |                                                                                     */
+    /* | Password |                   | |                                                                                     */
+    /* |          ----------------------|                                                                                     */
+    /* |                                |                                                                                     */
+    /* |          --------------------- |                                                                                     */
+    /* | Confirm  |                   | |                                                                                     */
+    /* |          --------------------- |                                                                                     */
+    /* |                                |                                                                                     */
+    /* |                Cancel Confirm  |                                                                                     */
+    /* |                                |                                                                                     */
+    /* +--------------------------------+                                                                                     */
+    /**************************************************************************************************************************/
+
+    After you close and then open pdfgear
+
+    /**************************************************************************************************************************/
+    /*  d:/pdf/class.pdf                                                                                                      */
+    /*                                                                                                                        */
+    /* When you open pdfgear                                                                                                  */
+    /*                                                                                                                        */
+    /* +--------------------------------+                                                                                     */
+    /* | Enter Password                 |                                                                                     */
+    /* |                                |                                                                                     */
+    /* | This documents is password     |                                                                                     */
+    /* | protected.                     |                                                                                     */
+    /* |                                |                                                                                     */
+    /* |          --------------------  |                                                                                     */
+    /* | Password | Type Here         | |                                                                                     */
+    /* |          --------------------- |                                                                                     */
+    /* |                                |                                                                                     */
+    /* |                     Cancel Ok  |                                                                                     */
+    /* |                                |                                                                                     */
+    /* +--------------------------------+                                                                                     */
+    /**************************************************************************************************************************/
+
+    /*____               _   _                         _ _                  _  __
+    |___ /   _ __  _   _| |_| |__   ___  _ __    _ __ (_) | _____ _ __   __| |/ _|
+      |_ \  | `_ \| | | | __| `_ \ / _ \| `_ \  | `_ \| | |/ / _ \ `_ \ / _` | |_
+     ___) | | |_) | |_| | |_| | | | (_) | | | | | |_) | |   <  __/ |_) | (_| |  _|
+    |____/  | .__/ \__, |\__|_| |_|\___/|_| |_| | .__/|_|_|\_\___| .__/ \__,_|_|
+            |_|    |___/                        |_|              |_|
+    */
+
+    * recreate input pdf;
+    %utlfkil(d:/pdf/class.pdf);
+    %utlfkil(d:/pdf/class_ps.pdf);
+
+    ods pdf file=
+     "d:/pdf/class.pdf";
+    proc print data=class;
+    run;quit;
+    ods pdf close;
+
+    %utl_pybeginx;
+    parmcards4;
+    import pikepdf
+    old_PDF = pikepdf.Pdf.open( \
+      "d:/pdf/class.pdf")
+    allow_key=pikepdf.Permissions(extract=False)
+    old_PDF.save(  \
+      "d:/pdf/class_ps.pdf"  \
+     ,encryption=pikepdf.Encryption( \
+        user="123456"   \
+       ,owner="roger" \
+       ,allow=allow_key))
+    print("New PDF created with password")
+    ;;;;
+    %utl_pyendx;
+
+    NOTE: PDFGEAR MAKES A COPY W PASSWORD
+
+    After you close and then open pdfgear
+
+    /**************************************************************************************************************************/
+    /*  d:/pdf/class.pdf                                                                                                      */
+    /*                                                                                                                        */
+    /* When you open pdfgear                                                                                                  */
+    /*                                                                                                                        */
+    /* +--------------------------------+                                                                                     */
+    /* | Enter Password                 |                                                                                     */
+    /* |                                |                                                                                     */
+    /* | This documents is password     |                                                                                     */
+    /* | protected.                     |                                                                                     */
+    /* |                                |                                                                                     */
+    /* |          --------------------  |                                                                                     */
+    /* | Password | Type Here         | |                                                                                     */
+    /* |          --------------------- |                                                                                     */
+    /* |                                |                                                                                     */
+    /* |                     Cancel Ok  |                                                                                     */
+    /* |                                |                                                                                     */
+    /* +--------------------------------+                                                                                     */
+    /**************************************************************************************************************************/
+
+    /*              _
+      ___ _ __   __| |
+     / _ \ `_ \ / _` |
+    |  __/ | | | (_| |
+     \___|_| |_|\__,_|
+
+    */
